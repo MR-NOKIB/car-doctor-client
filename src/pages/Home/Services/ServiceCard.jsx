@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { GoArrowRight } from "react-icons/go";
+import { Link } from "react-router-dom";
 
 const ServiceCard = ({ service }) => {
     const { img, title, _id, price } = service
@@ -16,9 +17,9 @@ const ServiceCard = ({ service }) => {
                 <h2 className="card-title">{title}</h2>
                 <div className=" flex justify-between">
                     <p className="text-xl text-orange-500">Price:${price}</p>
-                    <button className="text-[24px] text-orange-600">
+                    <Link to={`/checkout/${_id}`} className="text-[24px] text-orange-600">
                         <GoArrowRight />
-                    </button>
+                    </Link>
                 </div>
             </div>
         </div>
