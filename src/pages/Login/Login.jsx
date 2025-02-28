@@ -1,12 +1,15 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import img from '../../assets/images/login/login.svg'
 import { useContext } from 'react';
 import { AuthContext } from '../../Provider/AuthProvider';
+import SocialLogin from '../Shared/SocialLogin/SocialLogin';
 
 const Login = () => {
     const { signIn } = useContext(AuthContext);
     const navigate = useNavigate();
-    
+    const location = useLocation();
+    let from = location.state?.from?.pathname || "/";
+
     const handleLogin = (e) => {
         e.preventDefault();
         const form = e.target;
@@ -17,9 +20,9 @@ const Login = () => {
 
         signIn(email, password)
             .then(result => {
-                const loggedUser = result.user;
-                console.log(loggedUser);
-                navigate('/')
+                const user = result.user;
+                console.log(user);
+                navigate(from, { replace: true });
             })
             .catch(error => console.error(error));
     };
@@ -53,6 +56,7 @@ const Login = () => {
                     </form>
                     <div className="text-center mb-8">
                         <p>{"Don't"} have an account? <Link to="/signup" className="link link-hover text-orange-600 font-bold">Sign up</Link></p>
+                        <SocialLogin></SocialLogin>
                     </div>
                 </div>
             </div>

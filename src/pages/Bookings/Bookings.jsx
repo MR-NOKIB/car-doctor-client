@@ -4,16 +4,32 @@ import BookingRow from "./BookingRow";
 import Swal from "sweetalert2";
 
 const Bookings = () => {
-    const { user } = useContext(AuthContext);
+    const { user, logOut } = useContext(AuthContext);
     const [bookings, setBookings] = useState([]);
 
-    const url = `http://localhost:5000/bookings?email=${user?.email}`;
+    const url = `https://car-doctor-server-ecru-pi.vercel.app/bookings?email=${user?.email}`;
 
     useEffect(() => {
-        fetch(url)
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                authorization: `Bearer ${localStorage.getItem('car-access-token')}`
+            }
+        })
             .then(res => res.json())
-            .then(data => setBookings(data))
+            .then(data => {
+                if (data.error) {
+                    logOut()
+                        .then(() => {
+                            localStorage.removeItem('car-access-token')
+                        })
+                        .catch(error => console.error(error)
+                        )
+                }
+                setBookings(data)
+            })
     }, [url]);
+
 
     const handleDelete = id => {
         Swal.fire({
@@ -26,7 +42,7 @@ const Bookings = () => {
             confirmButtonText: "Yes, delete it!"
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`http://localhost:5000/bookings/${id}`, {
+                fetch(`https://car-doctor-server-ecru-pi.vercel.app/bookings/${id}`, {
                     method: 'DELETE'
                 })
                     .then(res => res.json())
@@ -47,7 +63,7 @@ const Bookings = () => {
     };
 
     const handleBookingConfirm = id => {
-        fetch(`http://localhost:5000/bookings/${id}`, {
+        fetch(`https://car-doctor-server-ecru-pi.vercel.app/bookings/${id}`, {
             method: 'PATCH',
             headers: {
                 'content-type': 'application/json'
@@ -61,7 +77,7 @@ const Bookings = () => {
                     const remaining = bookings.filter(booking => booking._id !== id);
                     const updated = bookings.find(booking => booking._id === id);
                     updated.status = 'confirmed';
-                    const newBookings  = [updated, ...remaining];
+                    const newBookings = [updated, ...remaining];
                     setBookings(newBookings);
                 }
             })
